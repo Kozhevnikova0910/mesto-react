@@ -1,6 +1,5 @@
 class Api {
     constructor(options) {
-        // тело конструктора
         this.baseUrl = options.baseUrl;
         this.headers = options.headers;
     }
@@ -30,7 +29,7 @@ class Api {
         return fetch(`${this.baseUrl}/users/me`, {
             method: 'PATCH',
             headers: this.headers,
-            body: JSON.stringify({name: inputValues.name, about: inputValues.description})
+            body: JSON.stringify({name: inputValues.name, about: inputValues.about})
         })
             .then(this._checkResponse)
     }
@@ -50,6 +49,14 @@ class Api {
             headers: this.headers,
         })
             .then(this._checkResponse)
+    }
+
+    changeLikeCardStatus(id, isLiked) {
+        if (isLiked) {
+            return this.deleteLike(id);
+        } else {
+            return this.putLike(id);
+        }
     }
 
     putLike(id) {
