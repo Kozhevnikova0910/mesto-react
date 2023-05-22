@@ -16,7 +16,10 @@ function App() {
     const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
     const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
 
-    const [selectedCard, setSelectedCard] = React.useState(null);
+    const [selectedCard, setSelectedCard] = React.useState({
+        name: '',
+        link: ''
+    });
     const [currentUser, setCurrentUser] = React.useState(userObject);
 
     const [cards, setCards] = React.useState([])
@@ -50,13 +53,14 @@ function App() {
         setIsEditAvatarPopupOpen(true)
     }
 
-    function closeAllPopups(e) {
-        if ((e.target.classList.contains('popup_opened')) || (e.target.classList.contains('popup__close-btn'))) {
-            setIsEditProfilePopupOpen(false);
-            setIsAddPlacePopupOpen(false);
-            setIsEditAvatarPopupOpen(false);
-            setSelectedCard(null);
-        }
+    function closeAllPopups() {
+        setIsEditProfilePopupOpen(false);
+        setIsAddPlacePopupOpen(false);
+        setIsEditAvatarPopupOpen(false);
+        setSelectedCard({
+            name: '',
+            link: ''
+        });
     }
 
     function handleCardLike(card) {
@@ -75,34 +79,33 @@ function App() {
             .then(() => {
                 setCards(() => cards.filter(c => c._id !== card._id ));
             });
-        setSelectedCard(null)
     }
 
     function handleUpdateUser(newUserData) {
         api.patchUserInfo(newUserData)
             .then(resUserData => {
                 setCurrentUser(resUserData);
+                closeAllPopups();
             })
             .catch(err => console.log(err))
-        setIsEditProfilePopupOpen(false)
     }
 
     function handleUpdateAvatar(newAvatar) {
         api.patchAvatar(newAvatar)
             .then(res => {
                 setCurrentUser(res);
+                closeAllPopups();
             })
             .catch(err => console.log(err))
-        setIsEditAvatarPopupOpen(false)
     }
 
     function handleAddPlace(newPlace) {
         api.postNewCard(newPlace)
             .then(resCard => {
                 setCards([resCard, ...cards]);
+                closeAllPopups();
             })
             .catch(err => console.log(err))
-        setIsAddPlacePopupOpen(false)
     }
 
     return (
@@ -115,7 +118,7 @@ function App() {
             <AddPlacePopup onAddPlace={handleAddPlace} isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} />
             <EditAvatarPopup onUpdateAvatar={handleUpdateAvatar} isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} />
             <PopupWithForm name="confirm" title="Вы уверены?" buttonText="Да"/>
-            {selectedCard && <ImagePopup card={selectedCard} onClose={closeAllPopups}/>}
+            <ImagePopup card={selectedCard} onClose={closeAllPopups}/>
         </div>
         </CurrentUserContext.Provider>
     );
